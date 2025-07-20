@@ -1,0 +1,9 @@
+{
+	"name": "VaibhavADFdemo",
+	"location": "centralindia",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "d866630b-2b4a-45c3-9773-2271a67ae4d0",
+		"tenantId": "e2421136-2da1-4c75-b8f0-22e94c579131"
+	}
+}
