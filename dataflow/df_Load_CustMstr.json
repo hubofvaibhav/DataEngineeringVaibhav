@@ -10,13 +10,6 @@
 						"type": "DatasetReference"
 					},
 					"name": "SourceCustMstr"
-				},
-				{
-					"dataset": {
-						"referenceName": "ds_MasterChild",
-						"type": "DatasetReference"
-					},
-					"name": "sourceMasterChildExport"
 				}
 			],
 			"sinks": [
@@ -26,21 +19,11 @@
 						"type": "DatasetReference"
 					},
 					"name": "SinkCustMstr"
-				},
-				{
-					"dataset": {
-						"referenceName": "ds_MasterChild_Sink",
-						"type": "DatasetReference"
-					},
-					"name": "sinkMasterChild"
 				}
 			],
 			"transformations": [
 				{
 					"name": "deriveDate"
-				},
-				{
-					"name": "deriveDateMC"
 				}
 			],
 			"scriptLines": [
@@ -54,19 +37,7 @@
 				"     ignoreNoFilesFound: false,",
 				"     rowUrlColumn: 'sourceFileName',",
 				"     wildcardPaths:['CUST_MSTR_*.csv']) ~> SourceCustMstr",
-				"source(output(",
-				"          MasterID as string,",
-				"          ChildID as string,",
-				"          RelationshipType as string",
-				"     ),",
-				"     allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     ignoreNoFilesFound: false,",
-				"     rowUrlColumn: 'fileName',",
-				"     wildcardPaths:['master_child_export-*.csv']) ~> sourceMasterChildExport",
 				"SourceCustMstr derive(Date = toDate(substring(sourceFileName, 10, 8), 'yyyyMMdd')) ~> deriveDate",
-				"sourceMasterChildExport derive(Date = toDate(substring(split(fileName, '-')[1], 0, 8), 'yyyyMMdd'),",
-				"          Datekey = toInteger(substring(split(fileName, '-')[1], 0, 8))) ~> deriveDateMC",
 				"deriveDate sink(allowSchemaDrift: true,",
 				"     validateSchema: false,",
 				"     input(",
@@ -88,31 +59,7 @@
 				"          CustomerName,",
 				"          City,",
 				"          Date",
-				"     )) ~> SinkCustMstr",
-				"deriveDateMC sink(allowSchemaDrift: true,",
-				"     validateSchema: false,",
-				"     input(",
-				"          MasterID as integer,",
-				"          ChildID as integer,",
-				"          RelationshipType as string,",
-				"          Date as date,",
-				"          DateKey as integer",
-				"     ),",
-				"     deletable:false,",
-				"     insertable:true,",
-				"     updateable:false,",
-				"     upsertable:false,",
-				"     format: 'table',",
-				"     skipDuplicateMapInputs: true,",
-				"     skipDuplicateMapOutputs: true,",
-				"     errorHandlingOption: 'stopOnFirstError',",
-				"     mapColumn(",
-				"          MasterID,",
-				"          ChildID,",
-				"          RelationshipType,",
-				"          Date,",
-				"          DateKey = Datekey",
-				"     )) ~> sinkMasterChild"
+				"     )) ~> SinkCustMstr"
 			]
 		}
 	}
