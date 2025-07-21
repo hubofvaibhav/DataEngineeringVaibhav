@@ -1,0 +1,104 @@
+{
+	"name": "df_Master_child",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "ds_MasterChild",
+						"type": "DatasetReference"
+					},
+					"name": "sourceMasterChildExport"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_MasterChild",
+						"type": "DatasetReference"
+					},
+					"name": "sourceMasterChildExport1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "ds_MasterChild_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "sinkMasterChildExport"
+				},
+				{
+					"dataset": {
+						"referenceName": "ds_MasterChild_Sink",
+						"type": "DatasetReference"
+					},
+					"name": "sinkMasterChildExport1"
+				}
+			],
+			"transformations": [
+				{
+					"name": "deriveDate"
+				},
+				{
+					"name": "deriveDateKey"
+				}
+			],
+			"scriptLines": [
+				"source(output(",
+				"          MasterID as string,",
+				"          ChildID as string,",
+				"          RelationshipType as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     rowUrlColumn: 'fileName') ~> sourceMasterChildExport",
+				"source(output(",
+				"          MasterID as string,",
+				"          ChildID as string,",
+				"          RelationshipType as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     rowUrlColumn: 'fileName') ~> sourceMasterChildExport1",
+				"sourceMasterChildExport derive(Date = toInteger(substring(split(fileName, '-')[1], 0, 8))) ~> deriveDate",
+				"sourceMasterChildExport1 derive(DateKey = toInteger(substring(split(fileName, '-')[1], 0, 8))) ~> deriveDateKey",
+				"deriveDate sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          MasterID as integer,",
+				"          ChildID as integer,",
+				"          RelationshipType as string,",
+				"          Date as date,",
+				"          DateKey as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkMasterChildExport",
+				"deriveDateKey sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          MasterID as integer,",
+				"          ChildID as integer,",
+				"          RelationshipType as string,",
+				"          Date as date,",
+				"          DateKey as integer",
+				"     ),",
+				"     deletable:false,",
+				"     insertable:true,",
+				"     updateable:false,",
+				"     upsertable:false,",
+				"     format: 'table',",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true,",
+				"     errorHandlingOption: 'stopOnFirstError') ~> sinkMasterChildExport1"
+			]
+		}
+	}
+}
